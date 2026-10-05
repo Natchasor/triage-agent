@@ -6,11 +6,11 @@ from textwrap import indent
 
 from openai import OpenAI, OpenAIError
 
-from .agent import TriageAgent, TriageError
+from .agent import TriageError
 from .config import Settings
 from .data_loader import load_tickets
 from .models import TriageResult
-from .tools import build_registry
+from .service import build_service
 
 
 def render(result: TriageResult) -> str:
@@ -28,6 +28,7 @@ def render(result: TriageResult) -> str:
         f"Reasoning:   {d.reasoning}",
         f"KB articles: {', '.join(d.kb_article_ids) or '-'}",
         f"Tools used:  {', '.join(result.tools_used) or '-'}",
+        f"Guardrails:  {'; '.join(result.guardrail_overrides) or 'none triggered'}",
         "Draft reply:",
         indent(d.draft_reply, "    "),
     ]
@@ -61,11 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         print("Set OPENAI_API_KEY in your .env file.", file=sys.stderr)
         return 2
 
-    agent = TriageAgent(client, build_registry(settings.data_dir), settings)
+    service = build_service(client, settings)
     failures = 0
     for ticket in tickets:
         try:
-            result = agent.triage(ticket)
+            result = service.triage(ticket)
         except (TriageError, OpenAIError) as exc:
             print(f"{ticket.ticket_id}: FAILED - {exc}", file=sys.stderr)
             failures += 1

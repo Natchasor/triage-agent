@@ -34,3 +34,10 @@ def test_render_shows_the_key_fields():
 def test_unknown_ticket_id_exits_with_code_2_before_any_api_call(capsys):
     assert main(["--ticket", "T-9999"]) == 2
     assert "No ticket with ID T-9999" in capsys.readouterr().err
+
+
+def test_render_lists_guardrail_overrides():
+    result = _result().model_copy(update={"guardrail_overrides": ["dispute_threat: escalated"]})
+
+    assert "dispute_threat: escalated" in render(result)
+    assert "none triggered" in render(_result())
