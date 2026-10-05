@@ -1,0 +1,56 @@
+[
+  {
+    "id": "kb_001",
+    "title": "Payment failed when upgrading to Pro",
+    "tags": ["billing", "upgrade", "payment", "pro", "card", "failed"],
+    "content": "An upgrade only activates after the payment is captured. If the payment screen shows an error, the bank may still have placed a temporary authorization hold on the card. Holds are not charges and normally disappear within 3-7 business days. Ask the customer not to retry repeatedly, because each retry can create a new hold. If the plan is still Free after payment, the Billing team must verify the transaction before access is granted manually."
+  },
+  {
+    "id": "kb_002",
+    "title": "Duplicate or pending charges",
+    "tags": ["billing", "duplicate", "pending", "charge", "refund", "dispute"],
+    "content": "Pending items in a bank app are usually authorization holds, not completed charges. The Billing team can see which charges were actually captured. Confirmed duplicate captures are refunded in 5-10 business days. Support must not promise a refund or a reversal date before the Billing team verifies the transactions. Disputing a charge with the bank before contacting Billing can freeze the account and slow resolution."
+  },
+  {
+    "id": "kb_003",
+    "title": "Refund policy",
+    "tags": ["billing", "refund", "policy"],
+    "content": "Refunds are issued for duplicate or erroneous charges after verification by the Billing team. Change-of-mind refunds are available within 14 days of the first Pro payment. Refunds return to the original payment method."
+  },
+  {
+    "id": "kb_004",
+    "title": "Troubleshooting error 500",
+    "tags": ["error", "500", "outage", "cannot access", "server", "down"],
+    "content": "A 500 error means the server failed to handle the request. If a single user is affected, ask them to clear the cache and retry. If several users, browsers or machines are affected, treat it as a probable outage: do not ask the customer to keep troubleshooting, and escalate to the infrastructure on-call team."
+  },
+  {
+    "id": "kb_005",
+    "title": "Service status and incident response",
+    "tags": ["status", "incident", "outage", "sla", "enterprise", "region", "on-call"],
+    "content": "The public status page is updated manually and can lag behind internal monitoring by up to 30 minutes, so 'all systems operational' does not rule out an incident. Use the internal region health check to confirm. Enterprise customers have a 15-minute response SLA for critical incidents, handled by the infrastructure on-call team with a human incident manager."
+  },
+  {
+    "id": "kb_006",
+    "title": "Dark mode and appearance settings",
+    "tags": ["dark mode", "theme", "appearance", "settings", "system default", "schedule"],
+    "content": "Appearance settings are in Settings > Appearance. Available themes are Light, Dark and System Default. The Dark theme is rolling out gradually; accounts not yet enabled only see Light and System Default. Updating to the latest app version and hard-refreshing the browser (Cmd+Shift+R) often fixes a missing Dark option. System Default follows the operating system theme only in desktop app 3.2 or later and the latest web app; older versions stay on light. Scheduled theme switching (for example automatic dark mode at 6pm) is not supported yet."
+  },
+  {
+    "id": "kb_007",
+    "title": "Submitting feature requests",
+    "tags": ["feature request", "suggestion", "feedback", "roadmap"],
+    "content": "Feature requests are logged by support and shared with the Product team through the feedback form. Do not promise delivery or dates. Thank the customer and tell them the request has been recorded."
+  },
+  {
+    "id": "kb_008",
+    "title": "Exporting data (Pro feature)",
+    "tags": ["export", "pdf", "csv", "slides", "pro", "plan"],
+    "content": "Export to PDF, CSV and slides is available on Pro and Enterprise plans. Free plan users can view reports but cannot export. Access is granted automatically once the Pro payment is captured."
+  },
+  {
+    "id": "kb_009",
+    "title": "Resetting your password",
+    "tags": ["password", "reset", "login", "account"],
+    "content": "Use 'Forgot password' on the sign-in page. A reset link is emailed and expires after 30 minutes. If no email arrives, check spam, then contact support."
+  }
+]

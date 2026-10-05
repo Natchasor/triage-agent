@@ -1,0 +1,12 @@
+{
+  "public_status_page": {
+    "overall": "all systems operational",
+    "last_updated_minutes_ago": 240
+  },
+  "country_to_region": {"TH": "ap-southeast", "US": "us-east", "DE": "eu-west"},
+  "regions": [
+    {"region": "us-east", "health": "healthy", "error_rate_pct": 0.2, "incident_id": null},
+    {"region": "eu-west", "health": "healthy", "error_rate_pct": 0.3, "incident_id": null},
+    {"region": "ap-southeast", "health": "degraded", "error_rate_pct": 38.5, "incident_id": "INC-2041", "incident_status": "investigating", "started_minutes_ago": 125}
+  ]
+}

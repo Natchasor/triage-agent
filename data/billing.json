@@ -1,0 +1,7 @@
+{
+  "c_1001": [
+    {"transaction_id": "txn_9001", "amount_usd": 29.99, "status": "pending", "description": "Pro plan upgrade", "minutes_ago": 175, "refund_status": "none"},
+    {"transaction_id": "txn_9002", "amount_usd": 29.99, "status": "pending", "description": "Pro plan upgrade", "minutes_ago": 115, "refund_status": "none"},
+    {"transaction_id": "txn_9003", "amount_usd": 29.99, "status": "pending", "description": "Pro plan upgrade", "minutes_ago": 55, "refund_status": "none"}
+  ]
+}

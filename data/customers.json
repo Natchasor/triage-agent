@@ -1,0 +1,29 @@
+[
+  {
+    "customer_id": "c_1001",
+    "plan": "free",
+    "region": "unknown",
+    "seats": 1,
+    "tenure_months": 4,
+    "previous_tickets": 0,
+    "notes": "Attempted to upgrade to Pro; account still shows Free plan."
+  },
+  {
+    "customer_id": "c_1002",
+    "plan": "enterprise",
+    "region": "TH",
+    "seats": 45,
+    "tenure_months": 8,
+    "previous_tickets": 0,
+    "notes": "First critical issue. Enterprise SLA applies."
+  },
+  {
+    "customer_id": "c_1003",
+    "plan": "pro",
+    "region": "unknown",
+    "seats": 1,
+    "tenure_months": 5,
+    "previous_tickets": 0,
+    "notes": "Active user with daily logins."
+  }
+]
