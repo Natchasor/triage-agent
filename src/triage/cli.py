@@ -48,7 +48,11 @@ def main(argv: list[str] | None = None) -> int:
     logging.getLogger("httpx").setLevel(logging.WARNING)  # hide per-request HTTP lines
     settings = Settings.from_env()
 
-    tickets = load_tickets(settings.data_dir)
+    try:
+        tickets = load_tickets(settings.data_dir)
+    except (OSError, ValueError) as exc:
+        print(f"Cannot read {settings.data_dir / 'tickets.json'}: {exc}", file=sys.stderr)
+        return 2
     if args.ticket:
         tickets = [t for t in tickets if t.ticket_id == args.ticket]
         if not tickets:

@@ -110,6 +110,28 @@ The sample tickets are in `data/tickets.json`:
   says everything is fine
 - **T-1003**: dark-mode question plus a feature request
 
+## Try your own ticket
+
+Add an entry to `data/tickets.json`, then run the agent on it:
+
+```json
+{
+  "ticket_id": "T-9001",
+  "customer_id": "c_1003",
+  "messages": [
+    {"minutes_ago": 10, "text": "I was charged twice this month and want a refund."}
+  ]
+}
+```
+
+Messages are listed oldest first, and `minutes_ago` is how long ago each one was sent. Use any
+`customer_id` from `data/customers.json` (`c_1001`, `c_1002`, `c_1003`). An unknown ID is allowed:
+the customer lookup simply reports that the customer was not found.
+
+```bash
+python -m triage.cli --ticket T-9001
+```
+
 ## Tests
 
 ```bash
@@ -153,8 +175,9 @@ The four tools, all backed by the mock data in `data/`:
 ## Extending
 
 - **Add a tool:** create a module in `src/triage/tools/` with a class that sets `name`,
-  `description` and `args_model` and implements `run()`. Then add one line to
-  `src/triage/tools/__init__.py`. The schema sent to the model is generated from `args_model`.
+  `description` and `args_model` and implements `run()`. Then import it and add it to the list in
+  `src/triage/tools/__init__.py`. The schema sent to the model is generated from `args_model`,
+  so no other code changes. To steer when the model uses it, mention it in the system prompt.
 - **Add a guardrail:** write a function `(decision, context) -> Override | None` in
   `src/triage/guardrails.py` and add it to `DEFAULT_RULES`.
 

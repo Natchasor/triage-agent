@@ -41,3 +41,13 @@ def test_render_lists_guardrail_overrides():
 
     assert "dispute_threat: escalated" in render(result)
     assert "none triggered" in render(_result())
+
+
+def test_unreadable_ticket_file_exits_with_code_2(monkeypatch, capsys):
+    def broken_loader(data_dir):
+        raise ValueError("Expecting value: line 1 column 1 (char 0)")
+
+    monkeypatch.setattr("triage.cli.load_tickets", broken_loader)
+
+    assert main([]) == 2
+    assert "Cannot read" in capsys.readouterr().err

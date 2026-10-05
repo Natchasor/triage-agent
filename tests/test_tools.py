@@ -21,14 +21,15 @@ def call(registry: ToolRegistry, name: str, **arguments):
 # ---------- registry ----------
 
 
-def test_registry_exposes_four_openai_function_specs(registry):
+def test_registry_exposes_the_core_tools_as_openai_function_specs(registry):
     specs = registry.specs()
-    assert [s["name"] for s in specs] == [
+    core_tools = {
         "get_customer_history",
         "search_knowledge_base",
         "get_billing_transactions",
         "check_system_status",
-    ]
+    }
+    assert core_tools <= {s["name"] for s in specs}
     for spec in specs:
         assert spec["type"] == "function"
         assert spec["description"]
