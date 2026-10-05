@@ -9,30 +9,46 @@ An AI agent that triages incoming customer-support tickets. For each ticket it:
 5. **Drafts a reply** in the customer's own language
 
 It runs in the terminal, uses the OpenAI API, and ships with three sample tickets (one is in
-Thai). A one-page write-up of the design is in [WRITEUP.md](WRITEUP.md).
+Thai). A one-page write-up of the design is in [WRITEUP.md](WRITEUP.md) (PDF copy:
+[WRITEUP.pdf](WRITEUP.pdf)).
 
 ## Quick start
 
 Requirements: **Python 3.11 or newer** and an **OpenAI API key**.
 
+**1. Get the code and install it**
+
 ```bash
 git clone <your-repo-url> triage-agent
 cd triage-agent
-
 python3 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 python -m pip install -e ".[dev]"
-
-cp .env.example .env             # then open .env and set OPENAI_API_KEY
-python -m triage.cli             # triage the three sample tickets
 ```
 
-Use `python -m ...` for every command in this file. It guarantees the tools from this
-virtual environment are the ones that run.
+On Windows, activate the environment with `.venv\Scripts\activate` instead.
+
+**2. Add your API key**
+
+```bash
+cp .env.example .env
+```
+
+Then open `.env` and replace `your-key-here` with your OpenAI API key. On Windows, use
+`copy .env.example .env` instead.
+
+**3. Run it**
+
+```bash
+python -m triage.cli
+```
+
+This triages the three sample tickets. Use `python -m ...` for every command in this file, so the
+tools from this virtual environment are the ones that run.
 
 ## Configuration
 
-Settings are read from `.env` (copy it from `.env.example`):
+Settings are read from `.env` (copied from `.env.example`):
 
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
@@ -43,21 +59,30 @@ Settings are read from `.env` (copy it from `.env.example`):
 To check your key and model before running the agent:
 
 ```bash
-python scripts/check_api.py      # should print the model name and "ready"
+python scripts/check_api.py
 ```
+
+It should print the model name followed by `ready`.
 
 ## Usage
 
 ```bash
-python -m triage.cli                    # all sample tickets
-python -m triage.cli --ticket T-1002    # one ticket
-python -m triage.cli --json             # full result as JSON
-python -m triage.cli -v                 # also log every tool call
+python -m triage.cli
+python -m triage.cli --ticket T-1002
+python -m triage.cli --json
+python -m triage.cli -v
 ```
 
-Each ticket prints its urgency, action (and team), extracted fields, the knowledge-base
-articles used, the tools called, any guardrail overrides, and a draft reply. Nothing is
-actually sent to customers.
+| Command | What it does |
+|---|---|
+| `python -m triage.cli` | Triage all the sample tickets |
+| `--ticket T-1002` | Triage one ticket |
+| `--json` | Print the full result as JSON |
+| `-v` | Also log every tool call |
+
+Each ticket prints its urgency, action (and team), extracted fields, the knowledge-base articles
+used, the tools called, any guardrail overrides, and a draft reply. Nothing is actually sent to
+customers.
 
 Example output (abbreviated):
 
@@ -132,6 +157,14 @@ The four tools, all backed by the mock data in `data/`:
   `src/triage/tools/__init__.py`. The schema sent to the model is generated from `args_model`.
 - **Add a guardrail:** write a function `(decision, context) -> Override | None` in
   `src/triage/guardrails.py` and add it to `DEFAULT_RULES`.
+
+## Troubleshooting
+
+- **"Cannot create the OpenAI client"**: `OPENAI_API_KEY` is missing. Check your `.env` file.
+- **`model_not_found` or a 404 error**: your key can't use the default model. Set `OPENAI_MODEL`
+  in `.env` to another model that supports the Responses API.
+- **`ModuleNotFoundError: triage`**: the virtual environment isn't active. Activate it and try
+  again.
 
 ## Known limitations
 
