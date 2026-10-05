@@ -14,8 +14,13 @@ class Settings:
     model: str = DEFAULT_MODEL
     data_dir: Path = PROJECT_ROOT / "data"
     max_tool_rounds: int = 6
+    request_timeout_s: float = 60.0
+    reasoning_effort: str | None = None  # e.g. "low"; None lets the model use its default
 
     @classmethod
     def from_env(cls) -> "Settings":
         load_dotenv(PROJECT_ROOT / ".env")
-        return cls(model=os.getenv("OPENAI_MODEL", DEFAULT_MODEL))
+        return cls(
+            model=os.getenv("OPENAI_MODEL", DEFAULT_MODEL),
+            reasoning_effort=os.getenv("OPENAI_REASONING_EFFORT") or None,
+        )

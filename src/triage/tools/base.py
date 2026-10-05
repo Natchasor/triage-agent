@@ -21,14 +21,13 @@ class Tool(ABC):
         """Execute with validated arguments and return JSON-serialisable data."""
 
     def spec(self) -> dict[str, Any]:
-        """The tool definition in OpenAI function-calling format."""
+        """The tool definition in OpenAI Responses API format."""
         return {
             "type": "function",
-            "function": {
-                "name": self.name,
-                "description": self.description,
-                "parameters": self.args_model.model_json_schema(),
-            },
+            "name": self.name,
+            "description": self.description,
+            "parameters": self.args_model.model_json_schema(),
+            "strict": False,  # the Responses API defaults to strict, which needs every field required
         }
 
 

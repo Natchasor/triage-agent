@@ -23,7 +23,7 @@ def call(registry: ToolRegistry, name: str, **arguments):
 
 def test_registry_exposes_four_openai_function_specs(registry):
     specs = registry.specs()
-    assert [s["function"]["name"] for s in specs] == [
+    assert [s["name"] for s in specs] == [
         "get_customer_history",
         "search_knowledge_base",
         "get_billing_transactions",
@@ -31,9 +31,10 @@ def test_registry_exposes_four_openai_function_specs(registry):
     ]
     for spec in specs:
         assert spec["type"] == "function"
-        assert spec["function"]["description"]
-        assert spec["function"]["parameters"]["type"] == "object"
-        assert spec["function"]["parameters"]["required"]
+        assert spec["description"]
+        assert spec["strict"] is False
+        assert spec["parameters"]["type"] == "object"
+        assert spec["parameters"]["required"]
 
 
 def test_duplicate_tool_names_are_rejected():
