@@ -19,7 +19,7 @@ Requirements: **Python 3.11 or newer** and an **OpenAI API key**.
 **1. Get the code and install it**
 
 ```bash
-git clone <your-repo-url> triage-agent
+git clone https://github.com/Natchasor/triage-agent.git
 cd triage-agent
 python3 -m venv .venv
 source .venv/bin/activate
