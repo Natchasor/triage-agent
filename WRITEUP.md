@@ -1,26 +1,30 @@
 # Write-up: Support Ticket Triage Agent
 
-## Architecture decisions
+## Architecture decisions and why
 
-- **Tool-calling agent loop, no framework.** The model chooses among four tools (customer history, knowledge-base search, billing, system status); a ~100-line loop runs them and feeds results back. I rejected a single prompt (not really an agent), a multi-step pipeline (more cost and latency for no gain here) and a framework (hides the logic being judged).
-- **The final answer is a tool call.** `submit_triage_decision` takes the `TriageDecision` schema. Invalid output is rejected with the validation error so the model can fix it; the last round forces submission, and a round cap bounds cost.
-- **Responses API.** My first version used Chat Completions, which OpenAI rejected for function tools combined with reasoning on the chosen model. The model name is an environment variable, so it works with the reviewer's key and model.
-- **The LLM proposes, code disposes.** Seven deterministic guardrails run after the model: critical, dispute or legal wording, and Enterprise plus high urgency all go to a human; angry customers are never auto-answered; confidence below 0.6 goes to a human; an auto-reply must cite a real knowledge-base article; team and action must agree. They can only make a decision more cautious (property-tested) and rely on our own data, not the model's claims.
-- **Code does the facts and arithmetic.** Billing totals, duplicate-charge detection and "status page contradicts internal health" are computed in the tools. Tool errors return as data, so the model recovers: it once queried "Asia", got the valid regions back, and retried with "TH".
-- **Testable offline.** The OpenAI client is injected, so 68 tests run against a scripted fake with no API key. Tool back-ends are JSON files and KB search is weighted keywords; each is replaceable in one file.
+I built a small tool-calling agent: the model chooses which tools to call, my code runs them, and the results go back to the model until it submits a decision. No framework, because the loop is only about 100 lines and I wanted the logic easy to read. A single prompt wouldn't be a real agent, and a fixed pipeline would cost more calls for no better decisions at this scale.
 
-## What could go wrong, and how I would handle it
+There are four tools: customer history, knowledge-base search, billing and system status. Anything computable is computed in the tools, not guessed by the model. The billing tool totals charges and flags duplicates, and the status tool flags when the public status page disagrees with internal health. That is how the agent catches the outage hiding behind "all systems operational" in the Thai ticket.
 
-- **Wrong urgency or action:** the prompt rates urgency by business impact, not tone; guardrails and low-confidence escalation catch the worst misses. Under-escalation is the costly error, so every guardrail pushes toward a human.
-- **Invented answers or promises:** replies may state only tool or KB facts and never promise refunds or timelines. Gap: the guardrail proves the cited article exists, not that it supports the reply.
-- **Prompt injection:** ticket text is fenced as data; tools are read-only; output is schema-validated; guardrails do not trust the model.
-- **Tool or API failure:** errors return to the model; requests have timeouts and retries; one failed ticket does not stop the rest. Production would queue failures for a human.
-- **Drift and variance:** pin the model. Borderline labels varied between runs (T-1003's sentiment flipped) while urgency and action stayed stable.
-- **Replies that claim actions:** "we have recorded your request" is only true if something records it. Production needs a logging tool.
-- **Privacy:** ticket text goes to a third-party API; production needs PII redaction and a data-processing agreement.
+The final answer is also a tool call, `submit_triage_decision`, validated against a Pydantic schema. If it's invalid, the model sees the error and retries. A round limit caps cost, and the last round forces a submission.
 
-## How I would evaluate it in production
+I use the Responses API. My first version used Chat Completions, which OpenAI rejected for function tools combined with reasoning on my chosen model. The model name is an environment variable, so it works with the reviewer's key.
 
-- **Offline, on every prompt or model change:** a labelled golden set of about 200 tickets (multilingual, adversarial, borderline). Track urgency accuracy (adjacent levels tolerated), action accuracy, and above all the **under-escalation rate**: tickets needing a human that were auto-answered. Check replies for language match, no promises, and claims supported by the cited article (LLM judge plus human sampling). Repeat each ticket several times to measure consistency.
-- **Rollout:** shadow mode first (agent suggests, humans decide), then auto-respond only for low-risk categories with sampled audits.
-- **Online:** human override rate, guardrail trigger rate (a rise signals drift), escalation rate, reopen rate and CSAT for auto-answered tickets, time to first response, and cost and tool rounds per ticket (p95).
+The rules that matter most don't rely on the model. Seven plain-Python guardrails review every decision. Critical tickets, dispute or legal wording, and urgent Enterprise tickets go to a human; angry customers are never auto-answered; low confidence goes to a human; an auto-reply must cite a real knowledge-base article; and team and action must agree. A guardrail can only make a decision more cautious, and a test checks that.
+
+The OpenAI client is injected, so the tests run offline against a scripted fake. Tool back-ends are JSON files and KB search is weighted keywords: mocks I can replace one file at a time.
+
+## What could go wrong
+
+- **A wrong call on an urgent ticket** is the worst case, so every guardrail pushes toward a human, and the prompt rates urgency by business impact, not tone. In ticket 1 the customer is shouting, but it's high, not critical.
+- **Invented answers or promised refunds.** The prompt forbids both, and auto-replies must cite a real article. The gap: that proves the article exists, not that it supports the reply.
+- **Prompt injection.** Ticket text is fenced as data, tools are read-only and output is schema-checked, so a successful injection can't do much.
+- **Tool or API failures** return to the model as errors it can recover from. Once it queried the status tool with "Asia", got the valid regions back and retried with "TH". Requests have timeouts and retries, and one failed ticket doesn't stop the batch.
+- **Run-to-run variance.** Ticket 3's sentiment flipped between neutral and positive across runs, while urgency and action stayed stable.
+- **Known gaps:** replies say a feature request was "recorded" but nothing records it, and ticket text goes to a third-party API without PII redaction.
+
+## How I'd evaluate it in production
+
+Before launch I'd build a labelled set of about 200 tickets, including other languages, vague messages and injection attempts, and re-run it on every prompt or model change. The number I'd watch most is under-escalation: tickets that needed a human but got an automatic reply. I'd also check replies for language, unsupported promises and whether the cited article backs them up (LLM judge plus human spot checks), and repeat each ticket a few times to measure consistency.
+
+I'd roll out in shadow mode first, with the agent suggesting and a person deciding, then allow auto-replies only for low-risk categories with sampled audits. Live, I'd track human override rate, guardrail trigger rate (a rise means drift), escalation rate, reopen rate and CSAT on auto-answered tickets, time to first response, and cost and tool rounds per ticket.
